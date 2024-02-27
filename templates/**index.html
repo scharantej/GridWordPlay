@@ -1,0 +1,88 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Word Search Game</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+// Function to create the 4x4 grid
+function createGrid() {
+var grid = '<table>';
+for (var i = 0; i < 4; i++) {
+grid += '<tr>';
+for (var j = 0; j < 4; j++) {
+grid += '<td><input type="text" size="1" maxlength="1"></td>';
+}
+grid += '</tr>';
+}
+grid += '</table>';
+
+// Append the grid to the DOM
+$('#grid').append(grid);
+}
+
+// Function to generate the grid with hidden words
+function generateGrid() {
+// Get the user-inputted words
+var words = $('#words').val().split(',');
+
+// Send the words to the server to generate the grid
+$.ajax({
+url: '/generate_grid',
+type: 'POST',
+data: { words: words },
+success: function(response) {
+// Replace the empty grid with the generated grid
+$('#grid').html(response);
+}
+});
+}
+
+// Function to check the user's answers
+function checkAnswers() {
+// Get the user's answers
+var answers = [];
+$('#grid input').each(function() {
+answers.push($(this).val());
+});
+
+// Send the answers to the server to check
+$.ajax({
+url: '/check_answers',
+type: 'POST',
+data: { answers: answers },
+success: function(response) {
+// Display the results
+$('#results').html(response);
+}
+});
+}
+
+// Create the grid
+createGrid();
+
+// Attach event listeners
+$('#generate_grid_button').click(generateGrid);
+$('#check_answers_button').click(checkAnswers);
+});
+</script>
+</head>
+<body>
+<h1>Word Search Game</h1>
+<div id="grid"></div>
+<br>
+<div>
+<label for="words">Enter words to hide in the grid (comma-separated):</label>
+<input type="text" id="words">
+</div>
+<br>
+<button id="generate_grid_button">Generate Grid</button>
+<br>
+<br>
+<div id="results"></div>
+</body>
+</html>
+
+
